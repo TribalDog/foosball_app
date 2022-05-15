@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(title: 'Foosball Identity App'),
+      home: HomePage(title: 'Foosball App'),
     );
   }
 }

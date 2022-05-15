@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [ "AQ6DDP9M8V.nz.co.kultivator.foosballApp" ],
+        "components": [
+          {
+            "/": "/foosball/*",
+            "comment": "Foosball side colour selection."
+          }
+        ]
+      }
+    ]
+  }
+}

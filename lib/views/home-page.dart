@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,6 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isScanning = false;
   String _sideId = '';
   String _errorMessage = '';
 
@@ -25,12 +27,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _init() async {
-    final receivedIntent = await AndroidIntent.ReceiveIntent.getInitialIntent();
-
     if (!mounted) return;
 
-    if (receivedIntent!.data != null) {
-      _setSideState(receivedIntent.data);
+    if (Platform.isAndroid) {
+      final receivedIntent = await AndroidIntent.ReceiveIntent
+          .getInitialIntent();
+
+      if (receivedIntent!.data != null) {
+        _setSideState(receivedIntent.data);
+      }
     }
   }
 
@@ -51,7 +56,9 @@ class _HomePageState extends State<HomePage> {
 
   void _scan() async {
     String sideId = '';
+
     setState(() {
+      _isScanning = true;
       _sideId = sideId;
       _errorMessage = '';
     });
@@ -65,6 +72,7 @@ class _HomePageState extends State<HomePage> {
           if (ndef == null) {
             setState(() {
               _errorMessage = 'This is not a valid Foosball side tag.';
+              _isScanning = false;
             });
             return;
           }
@@ -78,14 +86,23 @@ class _HomePageState extends State<HomePage> {
             }
           });
 
-          if (!found) {
+          if (found) {
+            setState(() {
+              _errorMessage = '';
+              _isScanning = false;
+            });
+          } else {
             setState(() {
               _errorMessage = 'This is an unknown Foosball side tag.';
+              _isScanning = false;
             });
           }
 
           await Future.delayed(const Duration(seconds: 2), () {
             NfcManager.instance.stopSession();
+            setState(() {
+              _isScanning = false;
+            });
           });
         },
       );
@@ -124,6 +141,12 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.red
               ),
             ),
+            SizedBox(
+              height: 24,
+            ),
+            _isScanning ? CircularProgressIndicator(
+              semanticsLabel: 'Scanning',
+            ):Container(),
           ],
         ),
       ),
